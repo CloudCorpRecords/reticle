@@ -786,6 +786,22 @@ function splitTextOwner(
   return best;
 }
 
+/**
+ * A CSS selector that names `el` without a snapshot: its testid, or its id when the id is a plain
+ * identifier. Absent when the element carries neither. A minted selector (an nth-of-type path)
+ * rots with the next render, so the hint does not offer one (#1147).
+ */
+function stableSelectorFor(el: HTMLElement): string | undefined {
+  const testid = readTestId(el);
+  if (null !== testid && 0 < testid.length) {
+    const escaped = testid.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+    return `[${getTestIdAttr()}="${escaped}"]`;
+  }
+  const id = el.getAttribute('id');
+  if (null !== id && /^[A-Za-z_][A-Za-z0-9_-]*$/.test(id)) return `#${id}`;
+  return undefined;
+}
+
 /** The text as the page shows it, when it differs from `wanted` only by case. */
 function caseOnlyMatch(container: HTMLElement, wanted: string): string | undefined {
   const target = normaliseVisibleText(wanted).toLowerCase();
@@ -940,8 +956,11 @@ function buildEmptyHint(
   const wanted = wantedTextOf(query);
   if (wanted !== undefined) {
     const owner = splitTextOwner(container, wanted, query);
-    if (owner !== undefined) hint.splitText = describe(owner);
-    else if (true === query.matchCase) {
+    if (owner !== undefined) {
+      const described = describe(owner);
+      const selector = stableSelectorFor(owner);
+      hint.splitText = selector === undefined ? described : { ...described, selector };
+    } else if (true === query.matchCase) {
       const shown = caseOnlyMatch(container, wanted);
       if (shown !== undefined) hint.caseMiss = shown;
     }
