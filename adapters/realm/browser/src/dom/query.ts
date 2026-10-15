@@ -24,8 +24,8 @@ import {
   isInViewport,
   isRenderedOutsideAriaHidden,
   isVisible,
-  measureGeometry,
 } from './a11y.js';
+import { attachGeometry } from './geometry.js';
 import { isIgnored, isReticleOverlay } from './dom-ignore.js';
 import { isSensitiveKey } from '@/security/serialization.js';
 import { declaredTestids } from '@/registry/capabilities.js';
@@ -617,10 +617,7 @@ export function matchQuery(
    */
   wholePhrase = true,
   diagnose: boolean = true,
-  /**
-   * Measure geometry for the described elements (#1539), on when a predicate asserts on it.
-   * `overlaps` names the other element as a query; its first match supplies the second box.
-   */
+  /** Measure geometry for the described elements (#1539), on when a predicate asserts on it. */
   geometry?: { overlaps?: ElementQuery },
 ): MatchResult {
   // NO blanket try/catch here. It would turn ANY exception during candidate-finding into
@@ -664,21 +661,7 @@ export function matchQuery(
       const projected = projectAttrs(el, attrs);
       if (projected !== undefined) base = { ...base, attrs: projected };
     }
-    if (geometry !== undefined) {
-      const measured = measureGeometry(el, visMemo);
-      if (overlapTarget !== undefined) {
-        const otherRect = overlapTarget.getBoundingClientRect();
-        const other = {
-          x: otherRect.x,
-          y: otherRect.y,
-          width: otherRect.width,
-          height: otherRect.height,
-        };
-        measured.overlap = { intersects: boxesIntersect(measured.box, other), box: other };
-      }
-      base = { ...base, geometry: measured };
-    }
-    return base;
+    return geometry === undefined ? base : attachGeometry(base, el, visMemo, overlapTarget);
   });
   return {
     matched: filtered.length > 0,
@@ -691,14 +674,6 @@ export function matchQuery(
     // when there is nothing to report, so the hot path pays nothing.
     ...(0 === filtered.length ? { hint: buildEmptyHint(query, state, diagnose) } : {}),
   };
-}
-
-/** Positive-area intersection: boxes that only touch at an edge do not overlap. */
-function boxesIntersect(
-  a: { x: number; y: number; width: number; height: number },
-  b: { x: number; y: number; width: number; height: number },
-): boolean {
-  return a.x < b.x + b.width && b.x < a.x + a.width && a.y < b.y + b.height && b.y < a.y + a.height;
 }
 
 /** Resolve `aria-labelledby` (one or more element IDs) to the referenced elements' text - a bare ID is
