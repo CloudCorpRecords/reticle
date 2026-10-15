@@ -373,4 +373,20 @@ describe('a selectable item is judged by its own label, not by its content', () 
     document.body.innerHTML = '<button id="d">Remove photo-remove-background.webm</button>';
     await expect(executeAction(refTo('#d'), 'click')).rejects.toThrow(/confirmDangerous/);
   });
+
+  it('still blocks a button whose hyphenated label is a destructive slug', async () => {
+    // Review case on #1620: delete-account is a label, not a filename, so nothing is stripped.
+    document.body.innerHTML = '<button id="d">delete-account</button>';
+    await expect(executeAction(refTo('#d'), 'click')).rejects.toThrow(/confirmDangerous/);
+  });
+
+  it('still blocks a button whose hyphenated label starts with a destructive word', async () => {
+    document.body.innerHTML = '<button id="d">Force-delete</button>';
+    await expect(executeAction(refTo('#d'), 'click')).rejects.toThrow(/confirmDangerous/);
+  });
+
+  it('still blocks a button whose aria-label joins a destructive word with an underscore', async () => {
+    document.body.innerHTML = '<button id="d" aria-label="delete_repo">X</button>';
+    await expect(executeAction(refTo('#d'), 'click')).rejects.toThrow(/confirmDangerous/);
+  });
 });

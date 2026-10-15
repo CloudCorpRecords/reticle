@@ -86,11 +86,14 @@ const SELECTION_ROLES: ReadonlySet<string> = new Set([
 ]);
 
 /**
- * Tokens that read as one filename or one hyphenated compound, never as an action verb.
- * `photo-remove-background.webm` is a filename, so the `remove` inside it is not an act. A real
- * `<button>Remove clip</button>` keeps its standalone word and still trips the guard.
+ * Tokens that read as one filename, never as an action verb.
+ * A token counts as a filename only when it ends in a known file extension.
+ * `photo-remove-background.webm` is a filename, so the `remove` inside it is not an act.
+ * A hyphen or an underscore alone does not make a filename: `delete-account` and `delete_repo`
+ * are labels, so they keep their words and still trip the guard.
  */
-const FILENAME_LIKE_TOKEN = /\S*\.[A-Za-z0-9]{1,8}\b|\b\S*[-_]\S*/g;
+const FILENAME_LIKE_TOKEN =
+  /\S+\.(?:webm|mp4|mov|mkv|avi|mp3|wav|ogg|flac|png|jpe?g|gif|webp|svg|avif|bmp|pdf|zip|tar|gz|txt|csv|json|xml|docx?|xlsx?|pptx?)\b/gi;
 
 function withoutFilenameTokens(text: string): string {
   return text.replace(FILENAME_LIKE_TOKEN, ' ');
