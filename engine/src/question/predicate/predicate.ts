@@ -303,9 +303,13 @@ async function evaluatePredicateRaw(
           predicate.overlaps === undefined
           ? undefined
           : {
-              fullyInViewport: predicate.fullyInViewport,
-              textClipped: predicate.textClipped,
-              overlaps: predicate.overlaps,
+              ...(predicate.fullyInViewport === undefined
+                ? {}
+                : { fullyInViewport: predicate.fullyInViewport }),
+              ...(predicate.textClipped === undefined
+                ? {}
+                : { textClipped: predicate.textClipped }),
+              ...(predicate.overlaps === undefined ? {} : { overlaps: predicate.overlaps }),
             },
       );
     case PredicateKind.TEXT: {
