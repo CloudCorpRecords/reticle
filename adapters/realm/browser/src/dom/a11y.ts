@@ -913,7 +913,7 @@ export function measureGeometry(el: Element, memo?: Map<Element, boolean>): Elem
   const uncut =
     clipped === undefined
       ? true
-      : clipped === null
+      : null === clipped
         ? false
         : clipped.left <= box.x &&
           clipped.top <= box.y &&
