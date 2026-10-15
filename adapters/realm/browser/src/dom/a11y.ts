@@ -908,14 +908,18 @@ export function measureGeometry(el: Element, memo?: Map<Element, boolean>): Elem
     box.y >= 0 &&
     box.x + box.width <= viewport.width &&
     box.y + box.height <= viewport.height;
+  // `visibleBounds` answers undefined when nothing clips the element, null when it is hidden
+  // outright, and the surviving region otherwise. Only the first and third shapes can be whole.
   const uncut =
-    clipped === undefined ||
-    (clipped.left <= box.x &&
-      clipped.top <= box.y &&
-      clipped.right >= box.x + box.width &&
-      clipped.bottom >= box.y + box.height);
-  const fullyInViewport =
-    null !== clipped && withinViewport && uncut && box.width > 0 && box.height > 0;
+    clipped === undefined
+      ? true
+      : clipped === null
+        ? false
+        : clipped.left <= box.x &&
+          clipped.top <= box.y &&
+          clipped.right >= box.x + box.width &&
+          clipped.bottom >= box.y + box.height;
+  const fullyInViewport = withinViewport && uncut && box.width > 0 && box.height > 0;
 
   const style = null === view ? null : view.getComputedStyle(el);
   const clipsX =

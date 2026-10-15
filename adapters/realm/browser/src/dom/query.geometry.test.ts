@@ -114,6 +114,13 @@ describe('matchQuery geometry evidence', () => {
     expect(missing.elements[0]?.geometry?.overlap).toBeUndefined();
   });
 
+  it('reports a hidden element as not fully in the viewport instead of throwing', () => {
+    document.body.innerHTML = '<div data-testid="card" style="display: none">Card</div>';
+    rectOf(byTestid('card'), { x: 10, y: 10, width: 200, height: 50 });
+    const match = matchQuery({ testid: 'card' }, undefined, undefined, undefined, undefined, {});
+    expect(match.elements[0]?.geometry?.fullyInViewport).toBe(false);
+  });
+
   it('stamps no geometry when the match did not ask for it', () => {
     document.body.innerHTML = '<div data-testid="card">Card</div>';
     const match = matchQuery({ testid: 'card' });
