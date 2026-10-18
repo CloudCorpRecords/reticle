@@ -479,8 +479,7 @@ export const RAW_TOOLS: ToolDef[] = withCompactEnvelope([
             .describe(
               'Present when a case-exact TEXT check missed and the page shows the text in another case: what it shows. Retry with ignoreCase: true if the case does not matter.',
             ),
-          // Declared here for the same reason presentRegions had to be: the browser emits it, and an
-          // undeclared field is stripped from structuredContent without a word.
+          // The browser emits this; undeclared, it would be stripped from structuredContent without a word.
           nameNearMiss: z
             .array(z.string())
             .optional()
