@@ -63,8 +63,9 @@ describe('launchedChromium', () => {
     );
     const err: unknown = await launchedChromium(true).catch((e: unknown) => e);
     expect(err).toMatchObject({ code: DriveErrorCode.LAUNCH_FAILED });
+    expect(String((err as Error).message)).toContain('looked for /x/chrome');
     expect(String((err as Error).message)).toMatch(
-      /^Chromium is not installed for Playwright\. Run: npx playwright@/,
+      /^Chromium is not installed for Playwright — looked for \S+\. Run: npx playwright@/,
     );
   });
 
