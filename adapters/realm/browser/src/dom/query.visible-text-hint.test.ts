@@ -133,6 +133,23 @@ describe('splitText hint only speaks for visible text', () => {
     expect(hint).toBeDefined();
     expect(hint?.selector).toBeUndefined();
   });
+
+  it('adds no selector when the testid repeats and the split text is past the first match', () => {
+    document.body.innerHTML =
+      '<p data-testid="row-status">first row</p>' +
+      '<p data-testid="row-status">All changes <b>saved</b></p>';
+    const hint = runQuery({ text: 'All changes saved' }).hint?.splitText;
+    expect(hint).toBeDefined();
+    expect(hint?.selector).toBeUndefined();
+  });
+
+  it('adds no selector when the id repeats', () => {
+    document.body.innerHTML =
+      '<p id="row-status">first row</p>' + '<p id="row-status">All changes <b>saved</b></p>';
+    const hint = runQuery({ text: 'All changes saved' }).hint?.splitText;
+    expect(hint).toBeDefined();
+    expect(hint?.selector).toBeUndefined();
+  });
 });
 
 /** A case-exact check missed on case alone and was told the text was "split across children". */
