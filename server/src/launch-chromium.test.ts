@@ -312,6 +312,22 @@ describe('the launch failure hint (#691)', () => {
     expect(hint).toContain('install chromium');
   });
 
+  /**
+   * A Windows account name can hold a space, such as C:\Users\Jo Doe. The pattern must read
+   * to the end of the line, or the message names C:\Users\Jo, a path that does not exist.
+   */
+  it('names the full path when the path contains a space', () => {
+    const hint = chromiumLaunchHint(
+      "browserType.launch: Executable doesn't exist at " +
+        'C:\\Users\\Jo Doe\\AppData\\Local\\ms-playwright\\chromium-1223\\chrome-win\\chrome.exe\n' +
+        'Looks like Playwright Test or Playwright was just installed or updated.',
+    );
+    expect(hint).toContain('Chromium is not installed for Playwright');
+    expect(hint).toContain(
+      'looked for C:\\Users\\Jo Doe\\AppData\\Local\\ms-playwright\\chromium-1223\\chrome-win\\chrome.exe',
+    );
+  });
+
   it('keeps the bare command when the failure names no path', () => {
     const hint = chromiumLaunchHint('browserType.launch: Target crashed unexpectedly');
     expect(hint).toMatch(/^Chromium is not installed for Playwright\. Run: /);

@@ -207,8 +207,14 @@ function chromiumMissingHint(executablePath?: string): string {
  * would name a build nobody tried whenever the launch used anything else.
  */
 function pathFromPlaywrightError(msg: string): string | undefined {
-  const found = /executable doesn.?t exist at ([^\s'"]+)/i.exec(msg);
-  return null === found ? undefined : found[1];
+  // Playwright puts the path at the end of the line, and a Windows path can hold a space
+  // (for example C:\Users\Jo Doe). Read to the end of the line and trim the result.
+  const found = /executable doesn.?t exist at (.+)$/im.exec(msg);
+  if (null === found) return undefined;
+  const captured = found[1];
+  if (undefined === captured) return undefined;
+  const path = captured.trim();
+  return '' === path ? undefined : path;
 }
 
 /**
