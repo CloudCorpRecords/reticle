@@ -19,7 +19,13 @@ import {
 } from '@reticlehq/core';
 import { SseFrameParser } from './sse-frame-parser.js';
 export { SseFrameParser, type SseFrame } from './sse-frame-parser.js';
-export { probeDaemon, waitForDaemon, waitForDaemonBind } from './proxy/proxy-daemon-probe.js';
+export {
+  daemonProcessAlive,
+  probeDaemon,
+  waitForDaemon,
+  waitForDaemonBind,
+  DAEMON_BIND_TIMEOUT_MS,
+} from './proxy/proxy-daemon-probe.js';
 import { probeDaemon } from './proxy/proxy-daemon-probe.js';
 import { SERVER_VERSION } from '@/command/version/identity/server-version.js';
 import { buildServerInstructions, localizeInstructions } from './server-instructions.js';
